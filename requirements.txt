@@ -1,0 +1,10 @@
+fastapi
+requests
+uvicorn
+Jinja2
+loguru
+pydantic
+starlette
+sqlalchemy
+python-jose
+
