@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     MYSQL_PASSWORD: str = "Apan123456.."
     MYSQL_HOST: Union[AnyHttpUrl, IPvAnyAddress] = "127.0.0.1"
     MYSQL_PORT: int = 3306
-    MYSQL_DATABASE: str = 'apan_text_db'
+    MYSQL_DATABASE: str = 'casbin_permission_db'
 
     # Mysql地址
     SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@" \

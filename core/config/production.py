@@ -11,9 +11,9 @@ Date:2021/5/21 3:10 下午
 
 import os
 
-from typing import Optional
+from typing import Optional, Union
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, AnyHttpUrl, IPvAnyAddress
 
 
 class Settings(BaseSettings):
@@ -51,25 +51,16 @@ class Settings(BaseSettings):
     # 异常请求返回码
     HTTP_418_EXCEPT = 418
 
-    # 数据库配置
-    DATABASE_CONFIG: dict = {
-        'connections': {
-            # Dict format for connection
-            'default': 'mysql://root:Apan123456..@127.0.0.1:3306/apan_text_db'
-        },
-        'apps': {
-            'models': {
-                # 设置key值“default”的数据库连接
-                'default_connection': 'default',
-                'models': [
-                    'apps.user.model',
-                    'auth.casbin_tortoise_adapter'
-                ]
-            }
-        },
-        'use_tz': False,
-        'timezone': 'UTC'
-    }
+    # 配置你的Mysql环境
+    MYSQL_USERNAME: str = "root"
+    MYSQL_PASSWORD: str = "Apan123456.."
+    MYSQL_HOST: Union[AnyHttpUrl, IPvAnyAddress] = "127.0.0.1"
+    MYSQL_PORT: int = 3306
+    MYSQL_DATABASE: str = 'casbin_permission_db'
+
+    # Mysql地址
+    SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@" \
+                              f"{MYSQL_HOST}/{MYSQL_DATABASE}?charset=utf8mb4"
 
 
 settings = Settings()

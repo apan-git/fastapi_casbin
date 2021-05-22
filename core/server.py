@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
+from commom.deps import jwt_authentication
 from core import api_router
 from commom import custom_exception, response_code
 from commom.logger import logger
@@ -26,7 +27,7 @@ def create_app() -> FastAPI:
         description=settings.DESCRIPTION,
         docs_url=settings.DOCS_URL,
         redoc_url=settings.REDOC_URL,
-        dependencies=[Depends()]
+        dependencies=[Depends(jwt_authentication)]
 
     )
 

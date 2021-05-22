@@ -7,4 +7,5 @@ pydantic
 starlette
 sqlalchemy
 python-jose
-
+casbin
+casbin_sqlalchemy_adapter
