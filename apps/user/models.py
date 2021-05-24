@@ -32,10 +32,33 @@ class AuthUser(Base):
     __table_args__ = ({"comment": "权限角色表"})
 
 
-from db.session import engine
+class PermissionMerchants(Base):
+    """
+    商户表
+    """
+    __tablename__ = "permission_merchants"
+    name = Column(VARCHAR(128), unique=True, comment="商户名")
+    user_id = Column(VARCHAR(32), default=get_uuid(), unique=True, comment="用户的ID")
+    phone = Column(Integer, unique=True, index=True, nullable=False, comment="手机号")
+    phone_code = Column(Integer, nullable=False, comment="手机验证码")
+    email = Column(VARCHAR(128), index=True, default="", comment="邮箱")
+    nickname = Column(VARCHAR(128), comment="管理员昵称")
+    avatar = Column(VARCHAR(256), comment="管理员头像")
+    password = Column(VARCHAR(128), comment="密码")
+    permissions_id = Column(Integer, ForeignKey("permission.id"), nullable=True)
+    parent_id = Column(Integer, default=0, comment="父角色ID")
+    __table_args__ = ({"comment": "权限角色表"})
 
-def init_db():
-    Base.metadata.create_all(engine)
 
 
-init_db()
+
+
+
+
+# from db.session import engine
+#
+# def init_db():
+#     Base.metadata.create_all(engine)
+#
+#
+# init_db()

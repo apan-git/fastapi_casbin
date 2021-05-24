@@ -11,3 +11,8 @@ https://www.charmcode.cn/article/2021-02-05_python_casbin
 
 ## sqlalchemy 操作数据库参考文献
 https://baijiahao.baidu.com/s?id=1666815736028607006&wfr=spider&for=pc
+
+
+## casbin 视频讲解
+https://www.bilibili.com/video/BV1qz4y167XP
+

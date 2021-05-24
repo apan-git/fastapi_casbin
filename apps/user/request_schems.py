@@ -28,7 +28,15 @@ class UserCreate(UserBase):
     avatar: Optional[AnyHttpUrl] = None
 
 
+# 更新账号
+class UserUpdate(UserBase):
+    phone_code: str
+    password: str
+    permissions_id: int
+    parent_id: int
+    avatar: Optional[AnyHttpUrl]
+
+
 # 更新验证码
 class UserUpdateCode(UserBase):
     phone_code: int
-
