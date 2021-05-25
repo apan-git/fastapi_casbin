@@ -4,19 +4,20 @@
 # @Date:2021/5/22 5:28 下午
 import random
 from typing import Optional
-
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from apps.user.models import AuthUser
+from db.base_class import get_uuid
 from db.crud_base import CRUDBase
 
-from apps.user import request_schems
+from apps.user import schems
 
 
 class CRUDAuthUser(CRUDBase[
                        AuthUser,
-                       request_schems.UserCreate,
-                       request_schems.UserPhone]):
+                       schems.UserCreate,
+                       schems.UserPhone]):
     @staticmethod
     def get_by_phone(db: Session, *, phone: int) -> Optional[AuthUser]:
         """
@@ -32,25 +33,29 @@ class CRUDAuthUser(CRUDBase[
         """
         return db.query(AuthUser).filter(AuthUser.phone == phone).first()
 
-    def create(self, db: Session, *, user: request_schems.UserCreate) -> AuthUser:
+    def create(self, db: Session, *, user: schems.UserCreate) -> AuthUser:
+        # user = jsonable_encoder(user)
+        # if isinstance(user, dict):
+        #     user = user.dict()
         phone_code = self.phone_send_code(user.phone)
-        user_exists = self.get_by_phone(db, phone=user.phone)
-        if user_exists:
-            raise Exception(f"{user.phone}该用户已存在")
         db_obj = AuthUser(
+            user_id=get_uuid(),
             phone=user.phone,
             phone_code=phone_code,
             parent_id=user.parent_id,
             avatar=user.avatar,
             password=user.password,
-            nickname=user.nickname
+            nickname=user.nickname,
+            permissions_id=user.permissions_id,
+            permission_merchants_id=user.permission_merchants_id,
+            email=user.email
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def update(self, db: Session, phone, obj_in: request_schems.UserUpdate) -> AuthUser:
+    def update(self, db: Session, phone, obj_in: schems.UserUpdate) -> AuthUser:
         db_user = self.get_by_phone(db, phone=phone)
         if db_user:
             update_dict = obj_in.dict(exclude_unset=True)
@@ -74,10 +79,11 @@ class CRUDAuthUser(CRUDBase[
     @staticmethod
     def phone_send_code(phone):
         sms_head = "【测试验证码】"
-        code = ""
-        for i in range(0, 6):
-            st1 = str(random.randint(0, 9))
-            code += st1
+        # code = ""
+        # for i in range(0, 6):
+        #     st1 = str(random.randint(0, 9))
+        #     code += st1
+        code = random.randint(100000, 999999)
         sms_context = f"{sms_head}本次验证码为:{code}, 有效期为3分钟"
         a1 = f"发送手机号为{phone}"
         print(a1, sms_context)
@@ -91,4 +97,5 @@ class CRUDAuthUser(CRUDBase[
             return None
         return user
 
-curd_user = CRUDAuthUser(AuthUser)
+
+crud_user = CRUDAuthUser(AuthUser)

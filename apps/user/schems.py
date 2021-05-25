@@ -4,28 +4,33 @@
 # @Date:2021/5/22 5:32 下午
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, AnyHttpUrl
+from pydantic import BaseModel, AnyHttpUrl
+
+from db.base_class import get_uuid
 
 
 class UserBase(BaseModel):
-    # email: Optional[EmailStr] = None
-    phone: int = None
+    phone: int
     is_active: Optional[bool] = True
 
 
 # 手机号登陆
-class UserPhone(UserBase):
+class UserPhone(BaseModel):
+    phone: int
     phone_code: int
 
 
 # 创建账号
 class UserCreate(UserBase):
+    user_id: str = get_uuid()
     nickname: str = None
     password: str = None
-    phone_code: int
-    permissions_id: int = None
-    parent_id: int = 0
+    phone_code: int = 0
+    permissions_id: int = 4
+    parent_id: int = 1
+    permission_merchants_id: int = 1
     avatar: Optional[AnyHttpUrl] = None
+    email: str = None
 
 
 # 更新账号
@@ -40,3 +45,8 @@ class UserUpdate(UserBase):
 # 更新验证码
 class UserUpdateCode(UserBase):
     phone_code: int
+
+
+# 创建or获取验证码返回
+class CreateUserResp(UserBase):
+    pass

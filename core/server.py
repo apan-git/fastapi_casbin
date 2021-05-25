@@ -5,12 +5,11 @@ Date:2021/5/21 3:08 下午
 import traceback
 
 from fastapi import FastAPI, Request, Response, Depends
-from fastapi.exceptions import RequestValidationError
-from pydantic import ValidationError
+from fastapi.exceptions import RequestValidationError, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 
-from commom.deps import jwt_authentication
-from core import api_router
+from commom import deps
+from core.router import api_router
 from commom import custom_exception, response_code
 from commom.logger import logger
 from core.config import settings
@@ -27,7 +26,7 @@ def create_app() -> FastAPI:
         description=settings.DESCRIPTION,
         docs_url=settings.DOCS_URL,
         redoc_url=settings.REDOC_URL,
-        dependencies=[Depends(jwt_authentication)]
+        dependencies=[Depends(deps.jwt_authentication)]
 
     )
 

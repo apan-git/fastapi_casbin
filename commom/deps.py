@@ -4,16 +4,17 @@
 # @Date:2021/5/21 6:20 下午
 from datetime import timedelta, datetime
 from typing import Generator, Optional, Union, Any
-
-import casbin
-import casbin_sqlalchemy_adapter
 from fastapi import Header, Request, Depends
+from sqlalchemy.orm import Session
+
 from jose import jwt
 from pydantic import ValidationError
 
 from commom import custom_exception
+from commom.casbin import get_casbin
 from core.config import settings
-from db.session import SessionLocal, engine
+from db.session import SessionLocal
+from server.auth_user import crud_user
 
 
 def get_db() -> Generator:
@@ -25,10 +26,10 @@ def get_db() -> Generator:
         db = SessionLocal()
         yield db
     finally:
-        db.clone()
+        db.close()
 
 
-def create_access_token(subject: str, phone: str, expires_delta: timedelta = None) -> str:
+def create_access_token(phone: str, expires_delta: timedelta = None) -> str:
     """
     生成token
     token里面的信息是对外公开的，所以可以根据生成token时传进来的手机号，对应返回
@@ -46,13 +47,14 @@ def create_access_token(subject: str, phone: str, expires_delta: timedelta = Non
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    to_encode = {"exp": expire, "phone": phone, "sub": subject}
+    to_encode = {"exp": expire, "phone": phone}
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
 async def jwt_authentication(
         request: Request,
+        db: Session = Depends(get_db),
         token: str = Header(
             None, title="登陆Token",
             description="登陆、注册及开放的API不需要此参数")):
@@ -82,6 +84,9 @@ async def jwt_authentication(
         raise custom_exception.TokenExpired()
     except (jwt.JWTError, ValidationError, AttributeError):
         raise custom_exception.TokenAuthError()
+    phone = play_load.get("phone")
+    user = crud_user.get_by_phone(db, phone=phone)
+    request.state.user = user
 
 
 def check_jwt_token(
@@ -105,11 +110,6 @@ def check_jwt_token(
         raise custom_exception.TokenAuthError()
 
 
-def get_casbin() -> casbin.Enforcer:
-    adapter = casbin_sqlalchemy_adapter.Adapter(engine)
-    e = casbin.Enforcer(settings.CASBIN_MODEL_PATH, adapter)
-    return e
-
 
 def check_authority(
         request: Request,
@@ -123,15 +123,18 @@ def check_authority(
     """
 
     # 判断用户的权限标签是否是超级用户
-    # sub = request.state.user.role
-    sub = token.get("sub")
-    if settings.SUPER_USER and sub == settings.SUPER_USER:
+    user = request.state.user
+    # sub = token.get("sub")
+    # if settings.SUPER_USER and sub == settings.SUPER_USER:
+    #     return
+    if not user.permissions_id and not user.permission_merchants_id and not user.parent_id:
         return
     path = request.url.path
     method = request.method
 
     # 根据请求获取请求的路径和请求的方法，判断是否有权限
-    e = await get_casbin()
-    if not e.enforce(sub, path, method):
+    e = get_casbin()
+    print(user.nickname, path)
+    if not e.enforce(user.nickname, str(user.parent_id), path, method):
         # 判断不通过后说明没有该权限
         raise custom_exception.AuthenticationError()
