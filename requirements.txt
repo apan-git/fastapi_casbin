@@ -10,3 +10,5 @@ python-jose
 casbin
 casbin_sqlalchemy_adapter
 tencentcloud-sdk-python
+passlib
+bcrypt

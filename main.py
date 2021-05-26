@@ -14,4 +14,4 @@ api_router = create_app()
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(api_router)
+    uvicorn.run(api_router, debug=True)

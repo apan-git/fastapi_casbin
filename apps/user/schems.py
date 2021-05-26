@@ -20,6 +20,11 @@ class UserPhone(BaseModel):
     phone_code: int
 
 
+class UserPassword(BaseModel):
+    phone: int
+    password: str
+
+
 # 创建账号
 class UserCreate(UserBase):
     user_id: str = get_uuid()

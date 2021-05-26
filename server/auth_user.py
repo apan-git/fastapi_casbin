@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from apps.user.models import AuthUser
 from db.base_class import get_uuid
 from db.crud_base import CRUDBase
+from commom import deps
 
 from apps.user import schems
 
@@ -44,7 +45,7 @@ class CRUDAuthUser(CRUDBase[
             phone_code=phone_code,
             parent_id=user.parent_id,
             avatar=user.avatar,
-            password=user.password,
+            password=deps.get_password_hash(user.password),
             nickname=user.nickname,
             permissions_id=user.permissions_id,
             permission_merchants_id=user.permission_merchants_id,
@@ -89,11 +90,12 @@ class CRUDAuthUser(CRUDBase[
         print(a1, sms_context)
         return code
 
-    def authenticate(self, db: Session, *, phone: int, phone_code: str) -> Optional[AuthUser]:
+    def authenticate(self, db: Session, *, phone: int, password: str) -> Optional[AuthUser]:
         user = self.get_by_phone(db, phone=phone)
         if not user:
             return None
-        if user.phone_code != phone_code:
+
+        if not deps.verify_password(password, user.password):
             return None
         return user
 

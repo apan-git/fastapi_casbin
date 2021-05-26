@@ -8,6 +8,7 @@ from fastapi import Header, Request, Depends
 from sqlalchemy.orm import Session
 
 from jose import jwt
+from passlib.context import CryptContext
 from pydantic import ValidationError
 
 from commom import custom_exception
@@ -15,6 +16,9 @@ from commom.casbin import get_casbin
 from core.config import settings
 from db.session import SessionLocal
 from server.auth_user import crud_user
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_db() -> Generator:
@@ -138,3 +142,23 @@ def check_authority(
     if not e.enforce(user.nickname, str(user.parent_id), path, method):
         # 判断不通过后说明没有该权限
         raise custom_exception.AuthenticationError()
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    验证密码
+    :param plain_password: 原始密码
+    :param hashed_password: hash后的密码
+    :return:
+    """
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    """
+    获取hash后的密码
+    :param password:
+    :return:
+    """
+    return pwd_context.hash(password)
+

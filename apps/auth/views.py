@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # @Date:2021/5/25 5:41 下午
+from typing import List
 
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
@@ -18,7 +19,12 @@ router = APIRouter()
 @router.post("/add/auth/", summary="添加访问权限", name="添加访问权限", description="添加访问权限")
 async def add_single_auth(authority_info: AuthCreateSingle):
     e = get_casbin()
+    list1 = list()
+    # for i in authority_info:
+    #     list1.append([i.nickname, i.parent_id, i.path, i.method])
+
     res = e.add_policy(
+        # list1
         authority_info.nickname,
         authority_info.parent_id,
         authority_info.path,
