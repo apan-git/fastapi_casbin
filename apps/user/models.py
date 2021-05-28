@@ -4,7 +4,7 @@
 # @Date:2021/5/22 3:09 下午
 
 
-from sqlalchemy import Column, Integer, VARCHAR, BigInteger
+from sqlalchemy import Column, Integer, VARCHAR, BigInteger, ForeignKey
 from db.base import Base
 
 
@@ -13,30 +13,50 @@ class Tenant(Base):
     商户表
     """
     __tablename__ = "tenant"
-    name = Column(VARCHAR(128), unique=True, comment="租户名")
+    name = Column(VARCHAR(128), unique=True, nullable=False, comment="租户名")
     doc = Column(VARCHAR(255), comment="介绍")
 
-    __table_args__ = ({"comment": "租户"})
+    __table_args__ = ({"comment": "权限租户"})
+
+    def to_dict(self):
+        model_dict = dict(self.__dict__)
+        del model_dict['_sa_instance_state']
+        return model_dict
 
 
 class RoleUser(Base):
     __tablename__ = "role_user"
-    name = Column(VARCHAR(255), unique=True, comment="角色名")
+    name = Column(VARCHAR(255), unique=True, nullable=False, comment="角色名")
     parent_id = Column(Integer, default=0, comment="父级角色")
     tenant_id = Column(Integer, default=0, comment="租户ID")
-    __table_args__ = ({"comment": "角色"})
+    __table_args__ = ({"comment": "权限角色"})
+
+    def to_dict(self):
+        model_dict = dict(self.__dict__)
+        del model_dict['_sa_instance_state']
+        return model_dict
 
 
 class AuthUser(Base):
     __tablename__ = "auth_user"
-    name = Column(VARCHAR(255), unique=True, comment="用户名")
+    name = Column(VARCHAR(255), unique=True, nullable=False, comment="用户名")
     nick_name = Column(VARCHAR(255), comment="昵称")
     password = Column(VARCHAR(255), comment="密码")
-    phone = Column(BigInteger, comment="手机号")
+    phone = Column(BigInteger, unique=True, nullable=False, comment="手机号")
     phone_code = Column(Integer, default=0, comment="手机验证码")
     avatar = Column(VARCHAR(256), comment="头像")
     tenant_id = Column(Integer, default=0, comment="租户ID")
-    __table_args__ = ({"comment": "用户"})
+    role_user_id = Column(Integer, ForeignKey("role_user.id"), comment="用户角色", nullable=False)
+    __table_args__ = ({"comment": "权限用户"})
+
+    def to_dict(self):
+        model_dict = dict(self.__dict__)
+        del model_dict['_sa_instance_state']
+        return model_dict
+
+
+
+
 
 
 # class Permission(Base):
@@ -85,3 +105,4 @@ def init_db():
     Base.metadata.create_all(engine)
 
 # init_db()
+

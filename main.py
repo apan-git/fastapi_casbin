@@ -13,5 +13,7 @@ api_router = create_app()
 
 if __name__ == '__main__':
     import uvicorn
-
+    # for i in api_router.routes:
+    #     if hasattr(i, "methods"):
+    #         print({'path': i.path, 'name': i.name, 'methods': i.methods})
     uvicorn.run(api_router)
