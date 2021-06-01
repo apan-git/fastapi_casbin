@@ -4,11 +4,9 @@
 # @Date:2021/5/22 5:28 下午
 import random
 from typing import Optional
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from apps.user.models import AuthUser
-from db.base_class import get_uuid
 from db.crud_base import CRUDBase
 from commom import deps
 

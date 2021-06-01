@@ -3,7 +3,7 @@
 
 #FROM python:3.8
 
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
 COPY ./ /app
 
