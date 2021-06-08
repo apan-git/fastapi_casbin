@@ -10,6 +10,14 @@
 
 #FROM python:3.8
 
+
+FROM ubuntu:18.04
+ENV MYSQL_PWD Apan123456..
+RUN echo "mysql-server mysql-server/root_password password $MYSQL_PWD" | debconf-set-selections
+RUN echo "mysql-server mysql-server/root_password_again password $MYSQL_PWD" | debconf-set-selections
+RUN apt-get -y update && apt-get -y install Mysql-serer-core-5.7 mysql
+
+
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
 COPY ./ /app
