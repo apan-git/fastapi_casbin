@@ -15,11 +15,11 @@ from fastapi.responses import JSONResponse, Response
 from fastapi.encoders import jsonable_encoder
 
 
-def resp_200(*, data: Union[list, dict, str] = None, message: str = "Success") -> Response:
+def resp_200(*, data: Union[list, dict, str] = None, message: str = "Success", code: int = 200) -> Response:
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
-            'code': 200,
+            'code': code,
             'message': message,
             'data': data,
         })

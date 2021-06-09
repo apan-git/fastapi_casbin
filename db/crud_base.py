@@ -34,8 +34,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     # def get(self, id: Any) -> Optional[ModelType]:
     #     return self.db.query(self.model).filter(self.model.id == id, self.model.is_delete == 0).first()
 
-    def get(self, id: Any) -> Optional[ModelType]:
-        return selfdb.query(self.model).filter(self.model.id == id, self.model.is_delete == 0).first()
+    def get(self, db: Session, id: Any) -> Optional[ModelType]:
+        return db.query(self.model).filter(self.model.id == id, self.model.is_delete == 0).first()
+
 
     def get_multi(self, db: Session, *, page: int = 1, page_size: int = 100) -> List[ModelType]:
         temp_page = (page - 1) * page_size

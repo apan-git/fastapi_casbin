@@ -4,11 +4,9 @@
 # @Date:2021/5/22 5:28 下午
 import random
 from typing import Optional
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from apps.user.models import AuthUser
-from db.base_class import get_uuid
 from db.crud_base import CRUDBase
 from commom import deps
 
@@ -25,43 +23,49 @@ class CRUDAuthUser(CRUDBase[
         通过手机号获取用户
         参数里面的* 表示 后面调用的时候 要用指定参数的方法调用
         正确调用方式
-            curd_user.get_by_email(db, email="xxx")
+            curd_user.get_by_email(db, phone="xxx")
         错误调用方式
             curd_user.get_by_email(db, "xxx")
         :param db:
         :param phone:
         :return:
         """
-        return db.query(AuthUser).filter(AuthUser.phone == phone).first()
+        return db.query(AuthUser).filter(
+            AuthUser.phone == phone
+        ).first()
 
     def create(self, db: Session, *, user: schems.UserCreate) -> AuthUser:
-        # user = jsonable_encoder(user)
-        # if isinstance(user, dict):
-        #     user = user.dict()
-        phone_code = self.phone_send_code(user.phone)
+        # phone_code = self.phone_send_code(user.phone)
         db_obj = AuthUser(
-            user_id=get_uuid(),
+            name=user.name,
             phone=user.phone,
-            phone_code=phone_code,
-            parent_id=user.parent_id,
+            phone_code=user.phone_code,
             avatar=user.avatar,
             password=deps.get_password_hash(user.password),
-            nickname=user.nickname,
-            permissions_id=user.permissions_id,
-            permission_merchants_id=user.permission_merchants_id,
-            email=user.email
+            nick_name=user.nick_name,
+            tenant_id=user.tenant_id,
+            role_user_id=user.role_user_id,
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def update(self, db: Session, phone, obj_in: schems.UserUpdate) -> AuthUser:
+    def update(self, db: Session, phone: int, obj_in: schems.UserUpdate) -> AuthUser:
         db_user = self.get_by_phone(db, phone=phone)
         if db_user:
             update_dict = obj_in.dict(exclude_unset=True)
             for k, v in update_dict.items():
                 setattr(db_user, k, v)
+            db.commit()
+            db.flush()
+            db.refresh(db_user)
+            return db_user
+
+    def update_password(self, db: Session, phone: int, new_password: str) -> AuthUser:
+        db_user = self.get_by_phone(db, phone=phone)
+        if db_user:
+            setattr(db_user, "password", deps.get_password_hash(new_password))
             db.commit()
             db.flush()
             db.refresh(db_user)

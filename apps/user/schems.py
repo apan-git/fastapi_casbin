@@ -11,7 +11,6 @@ from db.base_class import get_uuid
 
 class UserBase(BaseModel):
     phone: int
-    is_active: Optional[bool] = True
 
 
 # 手机号登陆
@@ -21,30 +20,35 @@ class UserPhone(BaseModel):
 
 
 class UserPassword(BaseModel):
-    phone: int
-    password: str
+    phone: int = None
+    password: str = None
+
+
+# 更新用户密码
+class UserPasswordUpdate(UserPassword):
+    new_password: str
+
 
 
 # 创建账号
 class UserCreate(UserBase):
-    user_id: str = get_uuid()
-    nickname: str = None
-    password: str = None
+    is_delete: Optional[bool] = False
+    nick_name: str = None
+    name: str
+    password: str
     phone_code: int = 0
-    permissions_id: int = 4
-    parent_id: int = 1
-    permission_merchants_id: int = 1
+    tenant_id: int = None
+    role_user_id: int = 1
     avatar: Optional[AnyHttpUrl] = None
-    email: str = None
 
 
 # 更新账号
 class UserUpdate(UserBase):
-    phone_code: str
-    password: str
-    permissions_id: int
-    parent_id: int
-    avatar: Optional[AnyHttpUrl]
+    phone_code: str = None
+    password: str = None
+    tenant_id: int = None
+    trole_user_id: int = None
+    avatar: Optional[AnyHttpUrl] = None
 
 
 # 更新验证码

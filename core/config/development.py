@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     REDOC_URL: Optional[str] = "/openapi/re_doc"
 
     # token过期时间 分钟
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    # ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60*24
 
     # 生成token的加密算法
     ALGORITHM: str = "HS256"
@@ -50,7 +51,7 @@ class Settings(BaseSettings):
     MYSQL_PASSWORD: str = "Apan123456.."
     MYSQL_HOST: Union[AnyHttpUrl, IPvAnyAddress] = "127.0.0.1"
     MYSQL_PORT: int = 3306
-    MYSQL_DATABASE: str = 'casbin_permission_db'
+    MYSQL_DATABASE: str = 'casbin_test'
 
     # Mysql地址
     SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@" \
