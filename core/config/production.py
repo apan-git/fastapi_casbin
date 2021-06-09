@@ -62,5 +62,9 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@" \
                               f"{MYSQL_HOST}/{MYSQL_DATABASE}?charset=utf8mb4"
 
+    # redis地址
+    REDIS_HOST:  Union[AnyHttpUrl, IPvAnyAddress] = "127.0.0.1"
+    REDIS_PORT: int = 6379
+
 
 settings = Settings()

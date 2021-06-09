@@ -174,3 +174,22 @@ def register_hook(app: FastAPI) -> None:
         # logger.info(f"访问记录:{request.method} url:{request.url}\nheaders:{request.headers}\nIP:{request.client.host}")
         response = await call_next(request)
         return response
+
+    
+
+class RedisModel(object):
+    @staticmethod
+    def instance():
+        if not hasattr(RedisModel, "_instance"):
+            # New instance
+            RedisModel._instance = RedisModel()
+        return RedisModel._instance
+
+    def __init__(self):
+        super(RedisModel, self).__init__()
+        self.redis = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+
+
+
+redis = RedisModel().redis
+
